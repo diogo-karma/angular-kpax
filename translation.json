@@ -1,0 +1,25 @@
+{
+  "title": "English",
+  "welcome": {
+    "welcomeToCrodity": "Welcome to Crodity.",
+    "welcomeSub": "Social Operating System, manage your social networks and applications in one place! <br>Enjoy the annual awards and earn money with Gamification! <span class=\"subsub\">Get great performance and who knows! You can get in to the VIP area or become a shareholder of Crodity.</span>",
+    "signInWith": "Sign in with",
+    "loginVip": "To access as a celebrity must have more than a million fans, please send your reference with facebook, twitter or another social network to verify.",
+    "loginVipSend": "Send profile",
+    "loginVipContact": "We will contact you asap."
+  },
+  "page": {
+    "home": {
+      "title": "Home"
+    },
+    "faq": {
+      "title": "FAQ"
+    },
+    "privacy": {
+      "title": "Privacy Policy"
+    },
+    "terms": {
+      "title": "Terms nd Conditions"
+    }
+  }
+}
