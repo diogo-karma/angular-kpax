@@ -5,7 +5,7 @@
     "Nechtan <dnechtan@gmail.com>"
   ],
   "description": "Angular-Kpax - AngularJS factory for Kpax",
-  "main": "ngkpax.js",
+  "main": "angular-kpax.js",
   "keywords": [
     "angular",
     "kpax",
