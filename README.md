@@ -16,7 +16,7 @@ bower install angular-kpax
 Add a `<script>` to your `index.html`:
 
 ```html
-<script src="/bower_components/angular-kpax/ngkpax.js"></script>
+<script src="/bower_components/angular-kpax/angular-kpax.js"></script>
 ```
 
 And add `ngKpax` as a dependency for your app:

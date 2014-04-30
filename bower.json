@@ -1,11 +1,11 @@
 {
   "name": "angular-kpax",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": [
     "Nechtan <dnechtan@gmail.com>"
   ],
   "description": "Angular-Kpax - AngularJS factory for Kpax",
-  "main": "ngkpax.js",
+  "main": "angular-kpax.js",
   "keywords": [
     "angular",
     "kpax",
