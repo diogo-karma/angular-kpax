@@ -1,5 +1,5 @@
 /*!
- * angular-kpax v0.0.1
+ * angular-kpax v0.0.4
  * Copyright(C) 2014 Dg Nechtan <dnechtan@gmail.com> (http://nechtan.github.io)
  */
 
@@ -92,7 +92,11 @@ angular.module('ngKpax', ['ngSocketIO'])
 
       var cache = $cacheFactory('kpax');
 
-      var _fn = {}, verbs = {}, self = this;
+      var _fn = {}, client = {}, self = this;
+
+      var iVerbs = ['get', 'head'];
+      var oVerbs = ['post', 'delete', 'del', 'put'];
+      var verbs = iVerbs.concat(oVerbs);
 
       var newHash = function newHash(prefix) {
         return '_'.concat(prefix || '',
@@ -101,12 +105,13 @@ angular.module('ngKpax', ['ngSocketIO'])
       };
 
       var $emit = function $emit(options, callback) {
+        console.log('new emit', options);
         options = angular.extend({
-          cache: true,
+          cache: !~oVerbs.indexOf(options.method || 'get'),
           method: 'get',
           url: '',
           params: {},
-          data: {}
+          data: {},
         }, options || {});
         var cached = false;
         var hash = newHash(options.method + ':' + options.url);
@@ -117,11 +122,15 @@ angular.module('ngKpax', ['ngSocketIO'])
             return cached._hash;
           }
         }
+        if(angular.isFunction(options.success)) {
+          callback = options.success;
+        }
         _fn[hash] = callback;
         socket.emit('kpax', {
           _hash: hash,
           _key: options.method + ':' + options.url,
           _cache: [options.cache, cacheKey],
+          to: options.hasOwnProperty('to') ? options.to : null,
           params: options.params
         });
         return hash;
@@ -129,31 +138,47 @@ angular.module('ngKpax', ['ngSocketIO'])
 
       var $on = function $on(verb, key, callback) {
         // Object jQuery-Ajax-Style
+        if (angular.isFunction(callback)) callback = [callback];
+        if (!callback) callback = [];
+
         if (angular.isObject(verb)) {
           var opt = verb;
-          if (opt.hasOwnProperty('type'))
-            verb = opt.type;
-          if (opt.hasOwnProperty('method'))
-            verb = opt.method;
-          if (opt.hasOwnProperty('url'))
-            key = opt.url
           if (angular.isFunction(key)) {
-            callback = key;
+            callback.push(key);
+            key = '';
           } else {
+            if (angular.isArray(key)) {
+              callback = callback.concat(key);
+              key = '';
+            }
             if (opt.hasOwnProperty('success')) {
-              callback = opt.success;
+              callback.push(opt.success);
+            }
+            if (opt.hasOwnProperty('complete')) {
+              callback.push(opt.success);
             }
           }
+          if (opt.hasOwnProperty('type')) {
+            verb = opt.type;
+          }
+          if (opt.hasOwnProperty('method')) {
+            verb = opt.method;
+          }
+          if (opt.hasOwnProperty('url')) {
+            key = opt.url;
+          }
         }
-        console.log('set $on', verb + ':' + key);
-        _fn[verb + ':' + key] = callback || function (req, res) {
-          res.send({});
-        };
+        var _key = verb + ':' + key;
+        console.log('set $on', _key, callback);
+        if (!angular.isArray(_fn[_key])) {
+          _fn[_key] = [];
+        }
+        _fn[_key] = _fn[_key].concat(callback);
       };
 
       socket.on('kpax', function (data) {
         console.log('on kpax', data);
-        if (_fn.hasOwnProperty(data._key) && angular.isFunction(_fn[data._key])) {
+        if (_fn.hasOwnProperty(data._key) && angular.isArray(_fn[data._key])) {
           console.log('$on _key', data._key);
           var _emit = function (ret) {
             socket.emit('kpax', {
@@ -162,15 +187,19 @@ angular.module('ngKpax', ['ngSocketIO'])
               data: ret
             });
           };
-          _fn[data._key].call(socket, data, {
-            send: _emit,
-            emit: _emit,
-            json: _emit
-          });
+          for (var x = 0, m = _fn[data._key].length; x < m; x++) {
+            if (angular.isFunction(_fn[data._key][x])) {
+              _fn[data._key][x].call(socket, data, {
+                send: _emit,
+                emit: _emit,
+                json: _emit
+              });
+            }
+          }
           return true;
         }
         if (angular.isFunction(_fn[data._hash])) {
-          console.log('$on _hash', data);
+          console.log('$on _hash', data._hash);
           if (angular.isArray(data._cache) && data._cache[0]) {
             cache.put(data._cache[1], data);
             if (angular.isNumber(data._cache[0]) && data._cache[0] > 0) {
@@ -184,29 +213,39 @@ angular.module('ngKpax', ['ngSocketIO'])
         }
       });
 
-      ['get', 'post', 'delete', 'del', 'put', 'head'].map(function (verb) {
-        verbs[verb] = function(url, data, params, callback) {
-          if(angular.isFunction(params)) {
-            callback = params;
+      verbs.map(function (verb) {
+        client[verb] = function (url, data, params, callback) {
+          if (angular.isObject(url)) {
+            if (angular.isFunction(data)) {
+              callback = data;
+            }
+            if (angular.isFunction(url.success)) {
+              callback = data;
+            }
+            $emit(url, callback);
+          } else {
+            if (angular.isFunction(params)) {
+              callback = params;
+              params = {};
+            }
+            $emit({
+              url: url,
+              method: verb,
+              params: params,
+              data: data
+            }, callback);
           }
-          $emit({
-            url: url,
-            method: verb,
-            params: params,
-            data: data,
-            callback: callback
-          })
         };
       });
 
-      verbs.on = $on.bind(socket);
-      verbs.emit = verbs.send = $emit.bind(socket);
-      verbs.socket = socket;
-      verbs.cache = cache;
-      verbs.identify = function kpaxIdentify(id) {
+      client.on = $on.bind(socket);
+      client.emit = client.send = $emit.bind(socket);
+      client.socket = socket;
+      client.cache = cache;
+      client.identify = function kpaxIdentify(id) {
         socket.emit('kpax:identify', id);
-        return verbs;
+        return client;
       };
-      return verbs;
+      return client;
 
 }]);
