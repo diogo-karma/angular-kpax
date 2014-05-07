@@ -1,5 +1,5 @@
 /*!
- * angular-kpax v0.0.4
+ * angular-kpax v0.0.5
  * Copyright(C) 2014 Dg Nechtan <dnechtan@gmail.com> (http://nechtan.github.io)
  */
 
@@ -105,7 +105,8 @@ angular.module('ngKpax', ['ngSocketIO'])
       };
 
       var $emit = function $emit(options, callback) {
-        console.log('new emit', options);
+        if (angular.isFunction(callback)) callback = [callback];
+        if (!callback) callback = [];
         options = angular.extend({
           cache: !~oVerbs.indexOf(options.method || 'get'),
           method: 'get',
@@ -118,12 +119,14 @@ angular.module('ngKpax', ['ngSocketIO'])
         if (options.cache) {
           var cacheKey = JSON.stringify([options.method, options.url, options.params]);
           if (cached = cache.get(cacheKey)) {
-            callback(cached.data);
+            for (var x = 0; x < callback.length; x++) {
+              callback[x](cached.data);
+            }
             return cached._hash;
           }
         }
-        if(angular.isFunction(options.success)) {
-          callback = options.success;
+        if (angular.isFunction(options.success)) {
+          callback.push(options.success);
         }
         _fn[hash] = callback;
         socket.emit('kpax', {
@@ -178,7 +181,7 @@ angular.module('ngKpax', ['ngSocketIO'])
 
       socket.on('kpax', function (data) {
         console.log('on kpax', data);
-        if (_fn.hasOwnProperty(data._key) && angular.isArray(_fn[data._key])) {
+        if (_fn.hasOwnProperty(data._key)) {
           console.log('$on _key', data._key);
           var _emit = function (ret) {
             socket.emit('kpax', {
@@ -187,6 +190,7 @@ angular.module('ngKpax', ['ngSocketIO'])
               data: ret
             });
           };
+          if(!_fn[data._key]['length']) _fn[data._key] = [_fn[data._key]];
           for (var x = 0, m = _fn[data._key].length; x < m; x++) {
             if (angular.isFunction(_fn[data._key][x])) {
               _fn[data._key][x].call(socket, data, {
@@ -198,8 +202,10 @@ angular.module('ngKpax', ['ngSocketIO'])
           }
           return true;
         }
-        if (angular.isFunction(_fn[data._hash])) {
-          console.log('$on _hash', data._hash);
+        if (_fn.hasOwnProperty(data._hash) && angular.isFunction(_fn[data._hash])) {
+          _fn[data._hash] = [_fn[data._hash]];
+        }
+        if (_fn[data._hash] && _fn[data._hash]['length']) {
           if (angular.isArray(data._cache) && data._cache[0]) {
             cache.put(data._cache[1], data);
             if (angular.isNumber(data._cache[0]) && data._cache[0] > 0) {
@@ -208,24 +214,33 @@ angular.module('ngKpax', ['ngSocketIO'])
               }, data._cache[0]);
             }
           }
-          _fn[data._hash](data.data);
+          for (var x = 0; x < _fn[data._hash].length; x++) {
+            if (angular.isFunction(_fn[data._hash][x])) {
+              _fn[data._hash][x](data.data);
+            }
+          }
           _fn[data._hash] = null;
         }
       });
 
       verbs.map(function (verb) {
         client[verb] = function (url, data, params, callback) {
+          if (angular.isFunction(callback)) callback = [callback];
+          if (!callback) callback = [];
           if (angular.isObject(url)) {
-            if (angular.isFunction(data)) {
-              callback = data;
+            if (angular.isFunction(url['success'])) {
+              callback.push(url.success);
             }
-            if (angular.isFunction(url.success)) {
-              callback = data;
+            if (angular.isFunction(url['complete'])) {
+              callback.push(url.complete);
+            }
+            if (angular.isFunction(data)) {
+              callback.push(data);
             }
             $emit(url, callback);
           } else {
             if (angular.isFunction(params)) {
-              callback = params;
+              callback.push(params);
               params = {};
             }
             $emit({
