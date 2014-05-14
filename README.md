@@ -31,19 +31,28 @@ var myApp = angular.module('myApp', ['ngKpax']);
 myApp.controller('myController', [
   '$scope', 'kpax',
   function ($scope, kpax) {
-    'use strict';
-    kpax.get('/hi', function(data) {
-      console.log(data);
+    kpax.get({
+      url: '/hi',
+      success: function(data) {
+        console.log(data);
+      }
     });
   }
 ]);
-
-
 ```
 
 ## Documentation
 
 TODO
+
+## Developing
+
+```bash
+  $ sudo npm -g gulp bower
+  $ bower install
+  $ npm install
+  $ gulp
+```
 
 
 ### Dependencies:

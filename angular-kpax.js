@@ -1,22 +1,22 @@
 /*!
- * angular-kpax v0.0.5
+ * angular-kpax v0.0.6
  * Copyright(C) 2014 Dg Nechtan <dnechtan@gmail.com> (http://nechtan.github.io)
  */
 
 angular.module('ngSocketIO', [])
-  .provider('ioFactory', function () {
+  .provider('ioFactory', function() {
     'use strict';
 
     var defaultPrefix = 'socket:';
     var ioSocket = null;
 
     this.$get = ['$rootScope', '$timeout',
-      function ($rootScope, $timeout) {
+      function($rootScope, $timeout) {
 
-        var asyncAngularify = function (socket, callback) {
-          return callback ? function () {
+        var asyncAngularify = function(socket, callback) {
+          return callback ? function() {
             var args = arguments;
-            $timeout(function () {
+            $timeout(function() {
               callback.apply(socket, args);
             }, 0);
           } : angular.noop;
@@ -30,7 +30,7 @@ angular.module('ngSocketIO', [])
           var prefix = options.prefix || defaultPrefix;
           var defaultScope = options.scope || $rootScope;
 
-          socket.on('error', function (reason) {
+          socket.on('error', function(reason) {
             if (/handshake/.test(reason)) {
               console.log('handshake error');
               socket.disconnect();
@@ -40,32 +40,32 @@ angular.module('ngSocketIO', [])
             }
           });
 
-          var addListener = function (eventName, callback) {
+          var addListener = function(eventName, callback) {
             socket.on(eventName, asyncAngularify(socket, callback));
           };
 
           var wrappedSocket = {
             on: addListener,
             addListener: addListener,
-            emit: function (eventName, data, callback) {
+            emit: function(eventName, data, callback) {
               return socket.emit(eventName, data, asyncAngularify(socket, callback));
             },
-            removeListener: function () {
+            removeListener: function() {
               return socket.removeListener.apply(socket, arguments);
             },
-            forward: function (events, scope) {
+            forward: function(events, scope) {
               if (events instanceof Array === false) {
                 events = [events];
               }
               if (!scope) {
                 scope = defaultScope;
               }
-              events.forEach(function (eventName) {
+              events.forEach(function(eventName) {
                 var prefixedEvent = prefix + eventName;
-                var forwardBroadcast = asyncAngularify(socket, function (data) {
+                var forwardBroadcast = asyncAngularify(socket, function(data) {
                   scope.$broadcast(prefixedEvent, data);
                 });
-                scope.$on('$destroy', function () {
+                scope.$on('$destroy', function() {
                   socket.removeListener(eventName, forwardBroadcast);
                 });
                 socket.on(eventName, forwardBroadcast);
@@ -75,7 +75,8 @@ angular.module('ngSocketIO', [])
 
           return wrappedSocket;
         };
-    }];
+      }
+    ];
 
   });
 
@@ -83,7 +84,7 @@ angular.module('ngKpax', ['ngSocketIO'])
   .constant('KPAX_SCHEMA', 'kpax:')
   .constant('KPAX_VERSION', '0.0.1')
   .factory('kpax', ['ioFactory', 'KPAX_SCHEMA', 'KPAX_VERSION', '$cacheFactory', '$timeout',
-    function (ioFactory, KPAX_SCHEMA, KPAX_VERSION, $cacheFactory, $timeout) {
+    function(ioFactory, KPAX_SCHEMA, KPAX_VERSION, $cacheFactory, $timeout) {
       'use strict';
 
       var socket = ioFactory({
@@ -179,18 +180,18 @@ angular.module('ngKpax', ['ngSocketIO'])
         _fn[_key] = _fn[_key].concat(callback);
       };
 
-      socket.on('kpax', function (data) {
+      socket.on('kpax', function(data) {
         console.log('on kpax', data);
         if (_fn.hasOwnProperty(data._key)) {
           console.log('$on _key', data._key);
-          var _emit = function (ret) {
+          var _emit = function(ret) {
             socket.emit('kpax', {
               _hash: data._hash,
               _key: data._key,
               data: ret
             });
           };
-          if(!_fn[data._key]['length']) _fn[data._key] = [_fn[data._key]];
+          if (!_fn[data._key]['length']) _fn[data._key] = [_fn[data._key]];
           for (var x = 0, m = _fn[data._key].length; x < m; x++) {
             if (angular.isFunction(_fn[data._key][x])) {
               _fn[data._key][x].call(socket, data, {
@@ -209,7 +210,7 @@ angular.module('ngKpax', ['ngSocketIO'])
           if (angular.isArray(data._cache) && data._cache[0]) {
             cache.put(data._cache[1], data);
             if (angular.isNumber(data._cache[0]) && data._cache[0] > 0) {
-              $timeout(function () {
+              $timeout(function() {
                 cache.remove(data._cache[1])
               }, data._cache[0]);
             }
@@ -223,8 +224,8 @@ angular.module('ngKpax', ['ngSocketIO'])
         }
       });
 
-      verbs.map(function (verb) {
-        client[verb] = function (url, data, params, callback) {
+      verbs.map(function(verb) {
+        client[verb] = function(url, data, params, callback) {
           if (angular.isFunction(callback)) callback = [callback];
           if (!callback) callback = [];
           if (angular.isObject(url)) {
@@ -263,4 +264,5 @@ angular.module('ngKpax', ['ngSocketIO'])
       };
       return client;
 
-}]);
+    }
+  ]);
