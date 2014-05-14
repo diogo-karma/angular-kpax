@@ -1,0 +1,28 @@
+{
+  "name": "angular-kpax",
+  "version": "0.0.5",
+  "description": "angular kpax ",
+  "main": "angular-kpax.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nechtan/angular-kpax.git"
+  },
+  "keywords": [
+    "angular",
+    "kpax",
+    "socket.io",
+    "express"
+  ],
+  "author": "Dg Nechtan <dnechtan@gmail.com> (http://hax0r.in)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nechtan/angular-kpax/issues"
+  },
+  "homepage": "https://github.com/nechtan/angular-kpax",
+  "devDependencies": {
+    "gulp": "^3.6.2",
+    "gulp-concat": "^2.2.0",
+    "gulp-uglify": "^0.3.0",
+    "gulp-insert": "^0.3.0"
+  }
+}

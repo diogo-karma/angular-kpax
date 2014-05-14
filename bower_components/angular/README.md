@@ -1,60 +1,33 @@
-angular-kpax
-============
+# bower-angular
 
-Angular-Kpax - AngularJS factory for Kpax
-
-This repo is for distribution on `bower`.
+This repo is for distribution on `bower`. The source for this module is in the
+[main AngularJS repo](https://github.com/angular/angular.js).
+Please file issues and pull requests against that repo.
 
 ## Install
 
 Install with `bower`:
 
 ```shell
-bower install angular-kpax
+bower install angular
 ```
 
 Add a `<script>` to your `index.html`:
 
 ```html
-<script src="/bower_components/angular/angular.min.js"></script>
-<script src="/bower_components/socket.io-client/dist/socket.io.min.js"></script>
-<script src="/bower_components/angular-kpax/angular-kpax.min.js"></script>
-<!-- or combined file -->
-<script src="/bower_components/angular/angular.min.js"></script>
-<script src="/bower_components/angular-kpax/socket.io-client-angular-kpax.js"></script>
-```
-
-And add `ngKpax` as a dependency for your app:
-
-```javascript
-var myApp = angular.module('myApp', ['ngKpax']);
-myApp.controller('myController', [
-  '$scope', 'kpax',
-  function ($scope, kpax) {
-    'use strict';
-    kpax.get('/hi', function(data) {
-      console.log(data);
-    });
-  }
-]);
-
-
+<script src="/bower_components/angular/angular.js"></script>
 ```
 
 ## Documentation
 
-TODO
-
-
-### Dependencies:
-* angularjs >= 1.2.x
-* socket.io-client >= 0.9.x
-
+Documentation is available on the
+[AngularJS docs site](http://docs.angularjs.org/).
 
 ## License
+
 The MIT License
 
-Copyright(C) 2014 Dg Nechtan <dnechtan@gmail.com> (http://nechtan.github.io)
+Copyright (c) 2010-2012 Google, Inc. http://angularjs.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
