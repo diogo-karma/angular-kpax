@@ -26,7 +26,7 @@ angular.module('ngSocketIO', [])
 
           options = options || {};
 
-          var socket = options.ioSocket || io.connect();
+          var socket = options.ioSocket || io.connect(options.hasOwnProperty('url') || null);
           var prefix = options.prefix || defaultPrefix;
           var defaultScope = options.scope || $rootScope;
 
@@ -83,12 +83,13 @@ angular.module('ngSocketIO', [])
 angular.module('ngKpax', ['ngSocketIO'])
   .constant('KPAX_SCHEMA', 'kpax:')
   .constant('KPAX_VERSION', '0.0.1')
-  .factory('kpax', ['ioFactory', 'KPAX_SCHEMA', 'KPAX_VERSION', '$cacheFactory', '$timeout',
-    function(ioFactory, KPAX_SCHEMA, KPAX_VERSION, $cacheFactory, $timeout) {
+  .factory('kpax', ['$window', 'ioFactory', 'KPAX_SCHEMA', 'KPAX_VERSION', '$cacheFactory', '$timeout',
+    function($window, ioFactory, KPAX_SCHEMA, KPAX_VERSION, $cacheFactory, $timeout) {
       'use strict';
 
       var socket = ioFactory({
-        failureRedirect: '/login'
+        failureRedirect: '/login',
+        url: $window.hasOwnProperty('_socket_url') ? $window._socket_url : null
       });
 
       var cache = $cacheFactory('kpax');
