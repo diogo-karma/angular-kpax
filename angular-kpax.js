@@ -1,5 +1,5 @@
 /*!
- * angular-kpax v0.0.6
+ * angular-kpax v0.0.7
  * Copyright(C) 2014 Dg Nechtan <dnechtan@gmail.com> (http://nechtan.github.io)
  */
 
@@ -26,7 +26,7 @@ angular.module('ngSocketIO', [])
 
           options = options || {};
 
-          var socket = options.ioSocket || io.connect(options.hasOwnProperty('url') || null);
+          var socket = options.ioSocket || io.connect(options.hasOwnProperty('url') ? options.url : null);
           var prefix = options.prefix || defaultPrefix;
           var defaultScope = options.scope || $rootScope;
 
