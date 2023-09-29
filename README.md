@@ -1,4 +1,4 @@
-angular-kpax
+angular-kpax // old but gold
 ============
 
 Angular-Kpax - AngularJS factory for Kpax
@@ -63,7 +63,7 @@ TODO
 ## License
 The MIT License
 
-Copyright(C) 2014 Diogo Karma <dnechtan@gmail.com> (https://karmnas.digital)
+Copyright(C) 2014 Diogo Karma <dnechtan@gmail.com> (https://karmns.digital)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
