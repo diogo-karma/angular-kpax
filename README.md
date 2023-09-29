@@ -63,7 +63,7 @@ TODO
 ## License
 The MIT License
 
-Copyright(C) 2014 Dg Nechtan <dnechtan@gmail.com> (http://nechtan.github.io)
+Copyright(C) 2014 Diogo Karma <dnechtan@gmail.com> (https://karmnas.digital)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
