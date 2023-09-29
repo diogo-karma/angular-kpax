@@ -63,7 +63,7 @@ TODO
 ## License
 The MIT License
 
-Copyright(C) 2014 Diogo Karma <dnechtan@gmail.com> (https://karmns.digital)
+ ▲ 2014 Diogo Karma <dnechtan@gmail.com> ▲ https://karmas.digital
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
